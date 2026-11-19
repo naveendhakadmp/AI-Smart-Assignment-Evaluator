@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}My assignments | GradePilot{% endblock %}
+{% block page_title %}Student Dashboard{% endblock %}
+{% block content %}
+<section class="welcome student-welcome"><div><span class="pill">STUDENT WORKSPACE</span><h2>Welcome, {{ account.full_name }}.</h2><p>Your assignment submissions and teacher-approved results, all in one place.</p></div><div class="profile-summary"><span>COLLEGE ID</span><b>{{ account.college_id }}</b><span>KID · {{ account.kid }} &nbsp; | &nbsp; {{ account.department }}</span><span>{{ account.semester }}</span></div></section>
+<section class="stats">
+  <div class="stat"><div class="stat-icon purple">▤</div><small>My submissions</small><strong>{{ rows|length }}</strong><span>Saved assignment history</span></div>
+  <div class="stat"><div class="stat-icon green">▣</div><small>Department</small><strong class="stat-label">{{ account.department }}</strong><span>{{ account.semester }}</span></div>
+  <div class="stat"><div class="stat-icon orange">✓</div><small>My account</small><strong class="stat-label">Active</strong><span>{{ account.college_id }}</span></div>
+</section>
+<section class="panel" id="upload"><div class="panel-head"><div><span class="eyebrow">NEW SUBMISSION</span><h3>Submit an assignment</h3><p>Your profile details are attached automatically. A teacher reviews the suggested marks.</p></div></div>
+  <form action="{{ url_for('student_submit') }}" method="post" enctype="multipart/form-data" class="upload-form"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><div class="fields"><label>Expected topics<input name="topics" placeholder="Python, Variables, Loops..." required></label><label>Total marks<input name="total" type="number" min="1" max="1000" step="0.5" value="10" required></label></div><label class="file-drop"><input type="file" name="assignment" accept=".pdf,.png,.jpg,.jpeg,.webp" required><span class="upload-symbol">↑</span><b>Choose PDF or assignment photo</b><small>PDF, PNG, JPG, WEBP · Maximum 20 MB</small></label><button class="primary" type="submit">Submit assignment</button></form>
+</section>
+<section class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">MY RECORDS</span><h3>Complete assignment history</h3><p>Suggested and teacher-approved marks for all submissions.</p></div></div>
+<div class="table-wrap"><table><thead><tr><th>DATE</th><th>TOPICS</th><th>AI SUGGESTION</th><th>FINAL MARKS</th><th>STATUS</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.created }}</td><td>{{ r.topics }}</td><td><span class="score">{{ r.suggested }} / {{ "%.1f"|format(r.total) }}</span></td><td><b>{{ r.final }} / {{ "%.1f"|format(r.total) }}</b></td><td><a class="view-link" href="{{ url_for('view',item_id=r.id) }}">View feedback →</a></td></tr>
+{% else %}<tr><td colspan="5" class="empty">No assignments submitted yet. Your history will appear here.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

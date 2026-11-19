@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard | GradePilot{% endblock %}
+{% block page_title %}Teacher Dashboard{% endblock %}
+{% block content %}
+<section class="welcome">
+  <div><span class="pill">✦ &nbsp; TEACHER WORKSPACE</span><h2>Assignment review, made smarter<span>.</span></h2><p>Manage student records, review suggested grades and export department-wise marksheets.</p></div>
+  <div class="welcome-art" aria-hidden="true"><div class="orb">✧</div><div class="paper">✓<small>GRADE<br>REVIEW</small></div></div>
+</section>
+<section class="stats">
+  <div class="stat"><div class="stat-icon purple">▤</div><small>Total submissions</small><strong>{{ total_submissions }}</strong><span>Saved assignment records</span></div>
+  <div class="stat"><div class="stat-icon green">♙</div><small>Students recorded</small><strong>{{ student_count }}</strong><span>Unique College IDs</span></div>
+  <div class="stat"><div class="stat-icon orange">✎</div><small>Teacher control</small><strong>100%</strong><span>Final marks editable</span></div>
+</section>
+<section class="panel" id="upload">
+  <div class="panel-head"><div><span class="eyebrow">NEW EVALUATION</span><h3>Upload student assignment</h3><p>Enter student details, assignment topics and maximum marks.</p></div><span class="step-tag">PDF · IMAGE</span></div>
+  <form action="{{ url_for('evaluate') }}" method="post" enctype="multipart/form-data" class="upload-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <div class="fields"><label>Student name<input name="student" placeholder="e.g. Rahul Sharma" required></label><label>College ID<input name="college_id" placeholder="e.g. CPU24CSE102" required></label></div>
+    <div class="fields"><label>KID<input name="kid" placeholder="Student KID (if available)"></label><label>Department<input name="department" placeholder="e.g. CSE / AIML / Mechanical" required></label></div>
+    <div class="fields"><label>Semester / year<input name="semester" placeholder="e.g. 3rd Semester"></label><label>Total marks<input name="total" type="number" min="1" max="1000" step="0.5" value="10" required></label></div>
+    <label>Expected topics<input name="topics" placeholder="Python, Variables, Loops..." required></label>
+    <label class="file-drop"><input type="file" name="assignment" accept=".pdf,.png,.jpg,.jpeg,.webp" required><span class="upload-symbol">↑</span><b>Choose PDF or assignment photo</b><small>PDF, PNG, JPG, WEBP · Maximum 20 MB</small></label>
+    <button class="primary" type="submit">✦ &nbsp; Analyse and suggest marks</button>
+  </form>
+</section>
+<section class="panel table-panel">
+  <div class="panel-head"><div><span class="eyebrow">STUDENT DATABASE</span><h3>All submissions</h3><p>Search by student name, College ID, KID or department.</p></div><div class="export-actions"><a class="export" href="{{ url_for('export',q=q,department=department) }}">⇩ CSV</a><a class="export" href="{{ url_for('export',q=q,department=department,format='xlsx') }}">⇩ Excel</a></div></div>
+  <form class="searchbar" method="get" action="{{ url_for('index') }}"><input name="q" value="{{ q }}" placeholder="Search name, College ID, KID or department..."><select name="department"><option value="">All departments</option>{% for d in departments %}<option value="{{ d }}" {% if department==d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select><button class="primary" type="submit">Search</button><a class="clear-search" href="{{ url_for('index') }}">Clear</a></form>
+  <div class="table-wrap"><table><thead><tr><th>STUDENT / COLLEGE ID</th><th>KID</th><th>DEPARTMENT</th><th>SEMESTER</th><th>SUBMITTED</th><th>AI SUGGESTION</th><th>FINAL MARKS</th><th>DETAILS</th></tr></thead><tbody>
+  {% for r in rows %}<tr><td><div class="student"><span class="student-avatar">{{ r.student[:1]|upper }}</span><div><b>{{ r.student }}</b><a class="sub-id" href="{{ url_for('student_history',college_id=r.college_id) }}">{{ r.college_id }} · View history</a></div></div></td><td>{{ r.kid or "—" }}</td><td>{{ r.department }}</td><td>{{ r.semester or "—" }}</td><td>{{ r.created }}</td><td><span class="score">{{ r.suggested }} / {{ "%.1f"|format(r.total) }}</span></td><td><form class="inline-edit" action="{{ url_for('edit',item_id=r.id) }}" method="post"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input aria-label="Final marks" name="final" type="number" min="0" max="{{ r.total }}" step="0.1" value="{{ r.final }}"><span>/ {{ "%.1f"|format(r.total) }}</span><button title="Save final marks">✓</button></form></td><td><a class="view-link" href="{{ url_for('view',item_id=r.id) }}">View →</a></td></tr>
+  {% else %}<tr><td colspan="8" class="empty">No records yet. Upload the first assignment above.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<div class="notice">ⓘ &nbsp; Offline rule-based suggestions are not verified AI grades. A teacher must review every assignment before approving final marks.</div>
+{% endblock %}

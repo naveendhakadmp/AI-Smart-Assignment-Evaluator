@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#201d3a">
+  <meta name="description" content="GradePilot assignment evaluation and marks management">
+  <link rel="manifest" href="{{ url_for('manifest') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>{% block title %}GradePilot | Smart Assignment Evaluator{% endblock %}</title>
+</head>
+<body class="{% if not current_account %}auth-body{% endif %}">
+{% if current_account %}
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-icon">G</span><span><b>GradePilot</b><small>SMART ASSESSMENT</small></span></a>
+    <nav>
+      {% if current_account.role == "teacher" %}
+      <a href="{{ url_for('index') }}">▦ <span>Dashboard</span></a>
+      <a href="{{ url_for('index') }}#upload">＋ <span>New evaluation</span></a>
+      <a href="{{ url_for('export') }}">⇩ <span>Export marksheets</span></a>
+      {% else %}
+      <a href="{{ url_for('student_dashboard') }}">▦ <span>My dashboard</span></a>
+      <a href="{{ url_for('student_dashboard') }}#upload">＋ <span>Submit assignment</span></a>
+      {% endif %}
+    </nav>
+    <div class="side-bottom">
+      <span class="avatar">{{ current_account.full_name[:1]|upper }}</span>
+      <span class="account-name"><b>{{ current_account.full_name }}</b><small>{{ current_account.role|title }} account</small></span>
+      <form action="{{ url_for('logout') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <button class="logout-button" type="submit" title="Sign out" aria-label="Sign out">↗</button>
+      </form>
+    </div>
+  </aside>
+{% endif %}
+<main class="main">
+  {% if current_account %}
+  <header>
+    <div><span class="eyebrow">ASSIGNMENT MANAGEMENT</span><h1>{% block page_title %}GradePilot{% endblock %}</h1></div>
+    <div class="top-right"><span class="status-dot"></span> Local workspace <button id="install-app" class="install-button" hidden>Install app</button></div>
+  </header>
+  {% endif %}
+  {% with messages=get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category,message in messages %}<div class="flash {{ category }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+  {% if current_account %}<footer>GradePilot · Assignment review and teacher-approved marks</footer>{% endif %}
+</main>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(error => console.error("Service worker registration failed", error)));
+}
+let installPrompt;
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  installPrompt = event;
+  const button = document.getElementById("install-app");
+  if (button) {
+    button.hidden = false;
+    button.addEventListener("click", async () => {
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      button.hidden = true;
+    }, { once: true });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ student.student }} history | GradePilot{% endblock %}
+{% block page_title %}Student assignment history{% endblock %}
+{% block content %}
+<div class="back"><a href="{{ url_for('index') }}">← Back to dashboard</a></div>
+<section class="panel"><span class="eyebrow">STUDENT PROFILE & HISTORY</span><h3>{{ student.student }}</h3><p class="muted">College ID: <b>{{ student.college_id }}</b> · KID: <b>{{ student.kid or "—" }}</b> · Department: <b>{{ student.department }}</b> · Semester: {{ student.semester or "—" }}</p>
+<div class="table-wrap"><table><thead><tr><th>DATE</th><th>ASSIGNMENT TOPICS</th><th>AI SUGGESTION</th><th>FINAL MARKS</th><th>DETAILS</th></tr></thead><tbody>{% for r in rows %}<tr><td>{{ r.created }}</td><td>{{ r.topics }}</td><td>{{ r.suggested }} / {{ "%.1f"|format(r.total) }}</td><td><b>{{ r.final }} / {{ "%.1f"|format(r.total) }}</b></td><td><a class="view-link" href="{{ url_for('view',item_id=r.id) }}">Open →</a></td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

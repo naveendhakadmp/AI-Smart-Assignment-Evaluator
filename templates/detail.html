@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Submission #{{ row.id }} | GradePilot{% endblock %}
+{% block page_title %}Submission review{% endblock %}
+{% block content %}
+<div class="back"><a href="{{ url_for('index') }}">← Back to dashboard</a></div>
+<section class="panel detail-panel"><div class="panel-head"><div><span class="eyebrow">SUBMISSION #{{ row.id }}</span><h3>{{ row.student }}</h3><p>College ID: <b>{{ row.college_id }}</b> · KID: <b>{{ row.kid or "—" }}</b> · Department: <b>{{ row.department }}</b> · Semester: {{ row.semester or "—" }}<br>Submitted {{ row.created }}</p></div><span class="pill">ASSIGNMENT REVIEW</span></div>
+<div class="detail-grid"><div class="metric"><small>Suggested marks</small><strong>{{ row.suggested }} <em>/ {{ row.total }}</em></strong></div><div class="metric"><small>Final marks</small><strong>{{ row.final }} <em>/ {{ row.total }}</em></strong></div></div>
+<h4>Expected topics</h4><p>{{ row.topics }}</p><h4>Evaluation notes</h4><p class="feedback">{{ row.feedback }}</p><h4>Uploaded assignment</h4><a class="view-link" target="_blank" rel="noopener" href="{{ url_for('uploaded',filename=row.filename) }}">Open uploaded file ↗</a>
+{% if current_account.role == "teacher" %}
+<h4>Update final marks</h4><form class="edit-large" action="{{ url_for('edit',item_id=row.id) }}" method="post"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input name="final" type="number" min="0" max="{{ row.total }}" step="0.1" value="{{ row.final }}" required><span>/ {{ row.total }}</span><button class="primary">Save teacher marks</button></form>
+<form action="{{ url_for('delete',item_id=row.id) }}" method="post" onsubmit="return confirm('Delete this submission?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="danger">Delete submission</button></form>
+{% endif %}</section>
+{% endblock %}

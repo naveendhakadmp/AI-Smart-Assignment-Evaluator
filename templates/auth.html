@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "setup" %}Teacher setup{% elif mode == "register" %}Student registration{% else %}Sign in{% endif %} | GradePilot{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <a class="brand auth-brand" href="{{ url_for('index') }}"><span class="brand-icon">G</span><span><b>GradePilot</b><small>SMART ASSESSMENT</small></span></a>
+  {% if mode == "setup" %}
+    <span class="eyebrow">FIRST-TIME SETUP</span><h1>Create teacher account</h1><p>Set up the workspace owner account to manage student assignments and marks.</p>
+    <form method="post" class="auth-form"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><label>Teacher name<input name="full_name" autocomplete="name" required></label><label>Username<input name="login_id" autocomplete="username" required></label><label>Password<input type="password" name="password" minlength="8" autocomplete="new-password" required><small>At least 8 characters</small></label><button class="primary" type="submit">Create teacher account</button></form>
+  {% elif mode == "register" %}
+    <span class="eyebrow">STUDENT ACCESS</span><h1>Create student account</h1><p>Register using your College ID and student details. You can submit assignments and view your marks history.</p>
+    <form method="post" class="auth-form"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><label>Student name<input name="full_name" autocomplete="name" required></label><div class="fields"><label>College ID<input name="college_id" autocomplete="username" required></label><label>KID<input name="kid" required></label></div><label>Department<input name="department" required></label><label>Semester / year<input name="semester" placeholder="e.g. 3rd Semester" required></label><label>Password<input type="password" name="password" minlength="8" autocomplete="new-password" required><small>At least 8 characters</small></label><button class="primary" type="submit">Create student account</button></form>
+  {% else %}
+    <span class="eyebrow">WELCOME BACK</span><h1>Sign in to GradePilot</h1><p>Teachers use their username. Students use their College ID.</p>
+    <form method="post" class="auth-form"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><label>Username / College ID<input name="login_id" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="primary" type="submit">Sign in</button></form>
+  {% endif %}
+  <div class="auth-links">
+    {% if mode == "login" %}<a href="{{ url_for('register') }}">Create student account</a>
+    {% elif mode == "register" %}<a href="{{ url_for('login') }}">Already registered? Sign in</a>
+    {% else %}<a href="{{ url_for('login') }}">Back to sign in</a>{% endif %}
+  </div>
+</section>
+{% endblock %}
