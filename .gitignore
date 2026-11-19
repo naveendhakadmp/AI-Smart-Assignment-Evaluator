@@ -6,19 +6,30 @@ ENV/
 *.pyc
 *.pyo
 *.pyd
+*.tmp
+*.temp
+*.swp
+*.bak
+*.orig
+*~
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-assignments.db
+*.db
 *.sqlite
 *.sqlite3
+*.sqlite-*
 uploads/*
 !uploads/.gitkeep
 build/
 dist/
 release/
-gradepilot.log
 *.log
+*.log.*
+coverage/
+htmlcov/
+.coverage
+*.egg-info/
 
 # Local environment and credentials
 .env
@@ -33,14 +44,20 @@ gradepilot.log
 *.password
 *.passwords
 *.credentials
-api_key*
-api-key*
+*.token
+*api_key*
+*api-key*
+*apikey*
+*_password.*
+password.*
 credentials.*
 secrets.*
 passwords.*
+token.*
 credentials/
 secrets/
 passwords/
+instance/
 
 # Editor and operating-system files
 .vscode/
